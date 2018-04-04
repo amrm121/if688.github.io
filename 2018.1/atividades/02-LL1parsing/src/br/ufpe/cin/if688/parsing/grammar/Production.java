@@ -21,7 +21,7 @@ public final class Production implements Iterable<GeneralSymbol> {
     public Nonterminal getNonterminal() {
         return nt;
     }
-
+    
     public List<GeneralSymbol> getProduction() {
         return Collections.unmodifiableList(production);
     }
