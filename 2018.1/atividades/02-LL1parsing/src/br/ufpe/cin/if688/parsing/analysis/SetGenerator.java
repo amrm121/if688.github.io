@@ -22,6 +22,7 @@ public final class SetGenerator {
     	Map<Nonterminal, Set<GeneralSymbol>> nn;
     	Collection<Production> prod = g.getProductions();
     	Iterator<Production> x = prod.iterator();
+    	
     	while(x.hasNext()) {
     		Production a = x.next();
     		
@@ -41,7 +42,23 @@ public final class SetGenerator {
     			case "specialsymbol":
     				ss.add(gs);
     				break;
+    			}else if(ls.get(i).getClass().getSimpleName().equalsIgnoreCase("nonterminal")) {
+    				Nonterminal aa = (Nonterminal) a.getProduction().get(i);
+    				//tenho que achar a produção desse não terminal
+    				boolean found = false;
+    				while(!found) {
+    					Iterator<Production> y = prod.iterator();
+    					while(y.hasNext()) {
+        					Production k = y.next();
+        					if(k.getNonterminal().equals(aa)) { //se ao percorrer novamente as produções acho o nao terminal, vejo o first do mesmo
+        						
+        					}
+        				}
+    				}
+    				
+    				
     			}
+    			System.out.println();
     		}
     	}  
     	
