@@ -6,6 +6,8 @@ import br.ufpe.cin.if688.parsing.grammar.*;
 
 
 public final class SetGenerator {
+	
+	//public static  talvez economizar codigo fazendo recursivamente quando o first for nonterminal
 
 	public static Map<Nonterminal, Set<GeneralSymbol>> getFirst(Grammar g) {
         
@@ -17,24 +19,32 @@ public final class SetGenerator {
     	 */
     	//System.out.println(g.getProductions());
     	//nonterminal, terminal, specialsymbol
+    	Map<Nonterminal, Set<GeneralSymbol>> nn;
     	Collection<Production> prod = g.getProductions();
     	Iterator<Production> x = prod.iterator();
     	while(x.hasNext()) {
     		Production a = x.next();
-    		Set<GeneralSymbol> ss = first.get(a.getNonterminal());
+    		
+    		
+    		
+    		
+    		Set<GeneralSymbol> ss = new HashSet<GeneralSymbol>();
     		List<GeneralSymbol> ls = a.getProduction();
-    		for(int i = 0; i < ls.size(); i++) {
-    			if(ls.get(i).getClass().getSimpleName().equalsIgnoreCase("terminal")) {
-    				ss.add(ls.get(i));
+    		//System.out.println(ls + " " + a.getNonterminal());
+    		for(GeneralSymbol gs : ls) {
+    			switch(gs.getClass().getSimpleName().toLowerCase()) {
+    			case "terminal":
+    				ss.add(gs);
     				break;
-    			}else if(ls.get(i).getClass().getSimpleName().equalsIgnoreCase("specialsymbol")) {
-    				ss.add(ls.get(i));
+    			case "nonterminal":
+    				break;
+    			case "specialsymbol":
+    				ss.add(gs);
     				break;
     			}
     		}
-    		first.put(a.getNonterminal(), ss);
-    		
     	}  
+    	
         return first;
     	
     }
@@ -64,6 +74,7 @@ public final class SetGenerator {
         
         return follow;
     }
+    
     
     //método para inicializar mapeamento nãoterminais -> conjunto de símbolos
     private static Map<Nonterminal, Set<GeneralSymbol>>
