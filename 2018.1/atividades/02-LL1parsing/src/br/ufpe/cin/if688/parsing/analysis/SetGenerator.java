@@ -9,6 +9,24 @@ public final class SetGenerator {
 	
 	//public static  talvez economizar codigo fazendo recursivamente quando o first for nonterminal
 
+	public static List<GeneralSymbol> nonter(GeneralSymbol nonterminal, Grammar g) {
+		Collection<Production> prod = g.getProductions();
+		Iterator<Production> it = prod.iterator();
+		while(it.hasNext()) {
+			Production a = it.next();
+			if(a.getNonterminal().equals(nonterminal)) {
+				List<GeneralSymbol> ls = a.getProduction();
+				for(GeneralSymbol gs : ls) {
+					if(gs.toString().charAt(0) == '<') {
+						nonter(gs, g);
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	
 	public static Map<Nonterminal, Set<GeneralSymbol>> getFirst(Grammar g) {
         
     	if (g == null) throw new NullPointerException("g nao pode ser nula.");
@@ -17,54 +35,57 @@ public final class SetGenerator {
     	/*
     	 * Implemente aqui o mÃ©todo para retornar o conjunto first
     	 */
-    	//System.out.println(g.getProductions());
-    	//nonterminal, terminal, specialsymbol
-    	Map<Nonterminal, Set<GeneralSymbol>> nn;
     	Collection<Production> prod = g.getProductions();
     	Iterator<Production> x = prod.iterator();
-    	
     	while(x.hasNext()) {
+    		boolean firstFound = false;
     		Production a = x.next();
-    		
-    		
-    		
-    		
     		Set<GeneralSymbol> ss = new HashSet<GeneralSymbol>();
+    		
     		List<GeneralSymbol> ls = a.getProduction();
     		//System.out.println(ls + " " + a.getNonterminal());
-    		for(GeneralSymbol gs : ls) {
-    			switch(gs.getClass().getSimpleName().toLowerCase()) {
-    			case "terminal":
-    				ss.add(gs);
-    				break;
-    			case "nonterminal":
-    				break;
-    			case "specialsymbol":
-    				ss.add(gs);
-    				break;
-    			}else if(ls.get(i).getClass().getSimpleName().equalsIgnoreCase("nonterminal")) {
-    				Nonterminal aa = (Nonterminal) a.getProduction().get(i);
-    				//tenho que achar a produção desse não terminal
-    				boolean found = false;
-    				while(!found) {
-    					Iterator<Production> y = prod.iterator();
-    					while(y.hasNext()) {
-        					Production k = y.next();
-        					if(k.getNonterminal().equals(aa)) { //se ao percorrer novamente as produções acho o nao terminal, vejo o first do mesmo
+    			for(GeneralSymbol gs : ls) {
+        			switch(gs.getClass().getSimpleName().toLowerCase()) {
+        			case "terminal":
+        				if(!firstFound) {
+        					ss.add(gs);
+        					firstFound = true;
+        				}
+        				break;
+        			case "nonterminal":
+        				Iterator<Production> az = prod.iterator();
+        				while(az.hasNext()) {
+        					Production z = az.next();
+        					List<GeneralSymbol> lz = z.getProduction();
+        					Nonterminal seek = z.getNonterminal();
+        					if(seek.equals(a.getNonterminal())) {
         						
         					}
         				}
-    				}
-    				
-    				
-    			}
-    			System.out.println();
+        				break;
+        			case "specialsymbol":
+        				ss.add(gs);
+        				break;
+        			default:
+        				break;
+        			}
     		}
-    	}  
-    	
+    			if(first.get(a.getNonterminal()).isEmpty()){
+    				first.put(a.getNonterminal(), ss);
+    			}else{
+    				Object[] arr = ss.toArray();
+    				if(!arr[0].getClass().getSimpleName().equals("Terminal")) {
+    					SpecialSymbol sp = (SpecialSymbol) arr[0];
+            			first.get(a.getNonterminal()).add(sp);
+    				}else{
+    					Terminal t = (Terminal) arr[0];
+    					first.get(a.getNonterminal()).add(t);
+    				}
+    			} 		
+    	} 
         return first;
     	
-    }
+	}
 
     
     public static Map<Nonterminal, Set<GeneralSymbol>> getFollow(Grammar g, Map<Nonterminal, Set<GeneralSymbol>> first) {
