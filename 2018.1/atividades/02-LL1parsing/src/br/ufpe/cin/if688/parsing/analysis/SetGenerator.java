@@ -53,14 +53,30 @@ public final class SetGenerator {
         				}
         				break;
         			case "nonterminal":
-        				Iterator<Production> az = prod.iterator();
-        				while(az.hasNext()) {
-        					Production z = az.next();
-        					List<GeneralSymbol> lz = z.getProduction();
-        					Nonterminal seek = z.getNonterminal();
-        					if(seek.equals(a.getNonterminal())) {
-        						
-        					}
+        				if(firstFound) {break;} //se o first da produção já for um terminal, ignorar o resto da produção
+        				boolean notfound = true;
+        				Nonterminal fprod = a.getNonterminal(); //terminal que gerou a prod
+        				while(notfound) {
+        					Iterator<Production> az = prod.iterator();
+            				while(az.hasNext()) {
+            					Production z = az.next();
+            					List<GeneralSymbol> lz = z.getProduction();
+            					Nonterminal seek = z.getNonterminal();
+            					if(seek.equals(fprod)) { //se for o terminal que a produção gerou
+            						for(GeneralSymbol gst : lz) {
+            							if(gst.getClass().getSimpleName().equalsIgnoreCase("NonTerminal")) {
+            								//Se o first da minha produção for um nao terminal, buscar novamente oq gera
+            								fprod = (Nonterminal) gst; //o nao terminal prof
+            								
+            							}else { //se a produção for um terminal````
+            								ss.add(gst);
+            							}
+            							break;
+            						}
+            						
+            					}
+            				}
+            				notfound = false;
         				}
         				break;
         			case "specialsymbol":
