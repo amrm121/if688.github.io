@@ -113,8 +113,48 @@ public final class SetGenerator {
             throw new NullPointerException();
                 
         Map<Nonterminal, Set<GeneralSymbol>> follow = initializeNonterminalMapping(g);
-        System.out.println(follow.toString());
-        System.out.println(first.toString());
+		Collection<Production> prod = g.getProductions();
+		Iterator<Production> x = prod.iterator();
+		while(x.hasNext()) {
+			Production p1 = x.next();
+			Nonterminal nt = p1.getNonterminal();
+			Set<GeneralSymbol> ans = new HashSet<GeneralSymbol>();
+			if(nt.equals(g.getStartSymbol())) { //se for o símbolo de start da gramática, então follow = $
+				Set<GeneralSymbol> ends = new HashSet<GeneralSymbol>();
+				GeneralSymbol end = SpecialSymbol.EOF;
+				ends.add(end);
+				follow.put(nt, ends);
+			}else{
+				Iterator<Production> f = prod.iterator();
+				while(f.hasNext()) {
+					boolean found = false;
+					Production seek = f.next();
+					List<GeneralSymbol> prodf = seek.getProduction();
+					Iterator<GeneralSymbol> gs = prodf.iterator();
+					while(gs.hasNext() && !found) {
+						GeneralSymbol sp = gs.next();
+						if(sp.equals(nt)) {
+							if(gs.hasNext() && !found) { 
+								GeneralSymbol sp1 = gs.next();
+								if(sp1.getClass().getSimpleName().equalsIgnoreCase("nonterminal")) {
+									follow.put((Nonterminal) sp, first.get(sp1));
+								}else if(sp1.getClass().getSimpleName().equalsIgnoreCase("terminal")) {
+									Set<GeneralSymbol> answ = new HashSet<GeneralSymbol>();
+									answ.add(sp1);
+									follow.put((Nonterminal) sp, answ);
+								}
+							}else {
+								ans = follow.get(seek.getNonterminal());
+								follow.put(nt, ans);
+							}
+						}
+					}
+					if(found) {
+						break;
+					}	
+				}
+			}
+		}
         
         return follow;
     }
