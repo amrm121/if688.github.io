@@ -38,13 +38,14 @@ public final class SetGenerator {
     	Collection<Production> prod = g.getProductions();
     	Iterator<Production> x = prod.iterator();
     	while(x.hasNext()) {
-    		boolean firstFound = false;
+    		boolean firstFound = false, notfound = true;
     		Production a = x.next();
     		Set<GeneralSymbol> ss = new HashSet<GeneralSymbol>();
     		
     		List<GeneralSymbol> ls = a.getProduction();
     		//System.out.println(ls + " " + a.getNonterminal());
-    			for(GeneralSymbol gs : ls) {
+    			for(GeneralSymbol gs : ls) { //gs quando um terminal symbol for achado precisa ir pro proximo da produção
+    				if(!notfound) {break;}
         			switch(gs.getClass().getSimpleName().toLowerCase()) {
         			case "terminal":
         				if(!firstFound) {
@@ -54,30 +55,32 @@ public final class SetGenerator {
         				break;
         			case "nonterminal":
         				if(firstFound) {break;} //se o first da produção já for um terminal, ignorar o resto da produção
-        				boolean notfound = true;
-        				Nonterminal fprod = a.getNonterminal(); //terminal que gerou a prod
-        				while(notfound) {
-        					Iterator<Production> az = prod.iterator();
-            				while(az.hasNext()) {
-            					Production z = az.next();
-            					List<GeneralSymbol> lz = z.getProduction();
-            					Nonterminal seek = z.getNonterminal();
-            					if(seek.equals(fprod)) { //se for o terminal que a produção gerou
-            						for(GeneralSymbol gst : lz) {
-            							if(gst.getClass().getSimpleName().equalsIgnoreCase("NonTerminal")) {
-            								//Se o first da minha produção for um nao terminal, buscar novamente oq gera
-            								fprod = (Nonterminal) gst; //o nao terminal prof
-            								
-            							}else { //se a produção for um terminal````
-            								ss.add(gst);
-            							}
-            							break;
-            						}
-            						
-            					}
-            				}
-            				notfound = false;
+        				Nonterminal fprod = (Nonterminal) gs; //nterminal gerado pela produção, achar oq esse nterminal produz agora
+    					Iterator<Production> az = prod.iterator();
+        				while(az.hasNext()) {
+        					Production z = az.next();
+        					List<GeneralSymbol> lz = z.getProduction();
+        					Nonterminal seek = z.getNonterminal();
+        					if(seek.equals(fprod)) { //se for o terminal que a produção gerou
+        						for(GeneralSymbol gst : lz) {
+        							if(gst.getClass().getSimpleName().equalsIgnoreCase("nonterminal")) {
+        								//Se o first da minha produção for um nao terminal, buscar novamente oq gera
+        								fprod = (Nonterminal) gst; //se manter no loop até ser um terminal o obj encontrado
+        							}else if(gst.getClass().getSimpleName().equalsIgnoreCase("specialsymbol")) { //se a produção for um terminal e e mesma produzir um epsilon, ignorar o epsilon e continuar a leitura da produção
+        								int aux = ls.indexOf(seek)+1;
+        								if(ls.get(aux).getClass().getSimpleName().equalsIgnoreCase("nonterminal")) {
+        									fprod = (Nonterminal) ls.get(aux);
+        								}
+        							}	
+        							else { 
+        								ss.add(gst);
+        							}
+        							break;
+        						}
+        						
+        					}
         				}
+            			notfound = false;
         				break;
         			case "specialsymbol":
         				ss.add(gs);
@@ -110,21 +113,8 @@ public final class SetGenerator {
             throw new NullPointerException();
                 
         Map<Nonterminal, Set<GeneralSymbol>> follow = initializeNonterminalMapping(g);
-        Collection<Production> prod = g.getProductions();
-        Nonterminal start = g.getStartSymbol();
-    		Iterator<Production> x = prod.iterator();
-    		while(x.hasNext()) {
-    			Production a = x.next();
-    			Set<GeneralSymbol> sx = first.get(a.getNonterminal());
-    			List<GeneralSymbol> ls = a.getProduction();
-    			if(a.getNonterminal().equals(start)) {
-    				sx.add(SpecialSymbol.EOF);
-    				//ss.clear();
-    			}else{
-    				
-    			}
-    			follow.put(a.getNonterminal(), sx);
-    		} 
+        System.out.println(follow.toString());
+        System.out.println(first.toString());
         
         return follow;
     }
