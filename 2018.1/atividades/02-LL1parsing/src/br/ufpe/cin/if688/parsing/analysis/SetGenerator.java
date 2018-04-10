@@ -179,6 +179,10 @@ public final class SetGenerator {
 											}else if(prodf.get(ct+2).getClass().getSimpleName().equalsIgnoreCase("terminal")) {
 												ans.add(prodf.get(ct+2));
 												ee = false;
+												if(ct+2 == prodf.size()-1) {
+													ans.removeAll(follow.get(seek.getNonterminal()));
+												}
+												
 											}	
 										}
 									}else {
@@ -189,10 +193,6 @@ public final class SetGenerator {
 											}else if(prodf.get(ct+1).getClass().getSimpleName().equalsIgnoreCase("terminal")) {
 												ans.add(prodf.get(ct+1));
 												ee = false;
-												if(ct+1 == prodf.size()) {
-													System.out.println(sym);
-												}
-												e1 = true;
 											}
 										}
 									}
@@ -200,9 +200,7 @@ public final class SetGenerator {
 								}else {
 									found = true;
 									if(gs.hasNext()) {ans.removeAll(follow.get(seek.getNonterminal()));}
-									else if(e1){
-										if(e1) {ans.removeAll(follow.get(seek.getNonterminal()));}
-									}
+									
 								}
 								break;
 							case "terminal":
