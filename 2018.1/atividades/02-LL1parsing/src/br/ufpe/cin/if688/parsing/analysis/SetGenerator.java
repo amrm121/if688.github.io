@@ -150,18 +150,20 @@ public final class SetGenerator {
 
 			Iterator<Production> f = prod.iterator();
 			Boolean found = false;
+			
 			while(f.hasNext() && !found) {
-				Nonterminal ntt = nt;
+				GeneralSymbol ntt = nt;
 				Set<GeneralSymbol> ans = new HashSet<GeneralSymbol>();
 				Production seek = f.next();
 				List<GeneralSymbol> prodf = seek.getProduction();
 				Iterator<GeneralSymbol> gs = prodf.iterator();
-				Iterator<GeneralSymbol> uh = prodf.iterator();
+				int ct = 0;
+				boolean ee = true, e1 = false;
 				while(gs.hasNext()) {
-					GeneralSymbol sym = gs.next();				
-					if(sym.equals(ntt)){			
-						if(gs.hasNext()) {
-							sym = gs.next();
+					GeneralSymbol sym = prodf.get(ct);
+					if(sym.equals(ntt)){
+						if(ct+1 < prodf.size()) {
+							if(ee) {sym = prodf.get(ct+1);}	
 							String sw = sym.getClass().getSimpleName().toLowerCase();
 							switch(sw) {
 							case "nonterminal":									
@@ -169,16 +171,38 @@ public final class SetGenerator {
 								boolean eps = ans.remove(SpecialSymbol.EPSILON);
 								if(eps) {
 									ans.addAll(follow.get(seek.getNonterminal()));
-									uh = gs;
-									if(uh.hasNext()) {
-										GeneralSymbol uhs = uh.next();
-										if(uhs.getClass().getSimpleName().equalsIgnoreCase("nonterminal")) {
-											ntt = (Nonterminal) uhs;
-											// = prodf.iterator();
+									if(ee) {
+										if(ct+2 < prodf.size()) {
+											if (prodf.get(ct+2).getClass().getSimpleName().equalsIgnoreCase("nonterminal")) {
+												ntt = (Nonterminal) prodf.get(ct+2);
+												ee = false;
+											}else if(prodf.get(ct+2).getClass().getSimpleName().equalsIgnoreCase("terminal")) {
+												ans.add(prodf.get(ct+2));
+												ee = false;
+											}	
+										}
+									}else {
+										if(ct+1 < prodf.size()) {
+											if (prodf.get(ct+1).getClass().getSimpleName().equalsIgnoreCase("nonterminal")) {
+												ntt = (Nonterminal) prodf.get(ct+1);
+												ee = false;
+											}else if(prodf.get(ct+1).getClass().getSimpleName().equalsIgnoreCase("terminal")) {
+												ans.add(prodf.get(ct+1));
+												ee = false;
+												if(ct+1 == prodf.size()) {
+													System.out.println(sym);
+												}
+												e1 = true;
+											}
 										}
 									}
-									}else {									
+										
+								}else {
 									found = true;
+									if(gs.hasNext()) {ans.removeAll(follow.get(seek.getNonterminal()));}
+									else if(e1){
+										if(e1) {ans.removeAll(follow.get(seek.getNonterminal()));}
+									}
 								}
 								break;
 							case "terminal":
@@ -195,6 +219,11 @@ public final class SetGenerator {
 								//fim da produção
 							break;
 						}
+					}
+					ct++;
+					gs.next();
+					if (found) {
+						break;
 					}
 				}
 				if(!ans.isEmpty()) follow.put(nt, ans);
