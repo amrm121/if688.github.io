@@ -1,5 +1,6 @@
 package br.ufpe.cin.if688.parsing.analysis;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 import br.ufpe.cin.if688.parsing.grammar.*;
@@ -111,50 +112,95 @@ public final class SetGenerator {
        
         if (g == null || first == null)
             throw new NullPointerException();
+        
                 
         Map<Nonterminal, Set<GeneralSymbol>> follow = initializeNonterminalMapping(g);
 		Collection<Production> prod = g.getProductions();
 		Iterator<Production> x = prod.iterator();
+		boolean ssp = false;
+		Set<GeneralSymbol> ends = new HashSet<GeneralSymbol>();
 		while(x.hasNext()) {
 			Production p1 = x.next();
 			Nonterminal nt = p1.getNonterminal();
-			Set<GeneralSymbol> ans = new HashSet<GeneralSymbol>();
-			if(nt.equals(g.getStartSymbol())) { //se for o símbolo de start da gramática, então follow = $
-				Set<GeneralSymbol> ends = new HashSet<GeneralSymbol>();
+			if(nt.equals(g.getStartSymbol())) { //se for o símbolo de start da gramática, então follow = $				
 				GeneralSymbol end = SpecialSymbol.EOF;
 				ends.add(end);
-				follow.put(nt, ends);
-			}else{
-				Iterator<Production> f = prod.iterator();
-				while(f.hasNext()) {
-					boolean found = false;
-					Production seek = f.next();
-					List<GeneralSymbol> prodf = seek.getProduction();
-					Iterator<GeneralSymbol> gs = prodf.iterator();
-					while(gs.hasNext() && !found) {
-						GeneralSymbol sp = gs.next();
-						if(sp.equals(nt)) {
-							if(gs.hasNext() && !found) { 
-								GeneralSymbol sp1 = gs.next();
-								if(sp1.getClass().getSimpleName().equalsIgnoreCase("nonterminal")) {
-									follow.put((Nonterminal) sp, first.get(sp1));
-								}else if(sp1.getClass().getSimpleName().equalsIgnoreCase("terminal")) {
-									Set<GeneralSymbol> answ = new HashSet<GeneralSymbol>();
-									answ.add(sp1);
-									follow.put((Nonterminal) sp, answ);
-								}
-							}else {
-								ans = follow.get(seek.getNonterminal());
-								follow.put(nt, ans);
+				Iterator<Production> ff = prod.iterator();
+				Nonterminal nts = g.getStartSymbol();
+				while(ff.hasNext() && !ssp) {
+					Production check = ff.next();
+					List<GeneralSymbol> cls = check.getProduction();
+					Iterator<GeneralSymbol> gsc = cls.iterator();
+					while(gsc.hasNext()) {
+						GeneralSymbol cs = gsc.next();
+						if(nts.equals(cs)) {
+							if(gsc.hasNext()) {
+								cs = gsc.next();
+								ends.add(cs);
 							}
 						}
+						
 					}
-					if(found) {
-						break;
-					}	
 				}
+				ssp = true;
+				if(!ends.isEmpty()) follow.put(g.getStartSymbol(), ends);
+				p1 = x.next();
+				nt = p1.getNonterminal();
+			}
+
+			Iterator<Production> f = prod.iterator();
+			Boolean found = false;
+			while(f.hasNext() && !found) {
+				Nonterminal ntt = nt;
+				Set<GeneralSymbol> ans = new HashSet<GeneralSymbol>();
+				Production seek = f.next();
+				List<GeneralSymbol> prodf = seek.getProduction();
+				Iterator<GeneralSymbol> gs = prodf.iterator();
+				Iterator<GeneralSymbol> uh = prodf.iterator();
+				while(gs.hasNext()) {
+					GeneralSymbol sym = gs.next();				
+					if(sym.equals(ntt)){			
+						if(gs.hasNext()) {
+							sym = gs.next();
+							String sw = sym.getClass().getSimpleName().toLowerCase();
+							switch(sw) {
+							case "nonterminal":									
+								ans.addAll(first.get(sym));
+								boolean eps = ans.remove(SpecialSymbol.EPSILON);
+								if(eps) {
+									ans.addAll(follow.get(seek.getNonterminal()));
+									uh = gs;
+									if(uh.hasNext()) {
+										GeneralSymbol uhs = uh.next();
+										if(uhs.getClass().getSimpleName().equalsIgnoreCase("nonterminal")) {
+											ntt = (Nonterminal) uhs;
+											// = prodf.iterator();
+										}
+									}
+									}else {									
+									found = true;
+								}
+								break;
+							case "terminal":
+								ans.add(sym);
+								found = true;
+								break;
+							default:
+								break;
+							}
+							
+						}else{
+								ans.addAll(follow.get(seek.getNonterminal()));
+								found = true;
+								//fim da produção
+							break;
+						}
+					}
+				}
+				if(!ans.isEmpty()) follow.put(nt, ans);
 			}
 		}
+		
         
         return follow;
     }
