@@ -158,7 +158,7 @@ public final class SetGenerator {
 				List<GeneralSymbol> prodf = seek.getProduction();
 				Iterator<GeneralSymbol> gs = prodf.iterator();
 				int ct = 0;
-				boolean ee = true, e1 = false;
+				boolean ee = true;
 				while(gs.hasNext()) {
 					GeneralSymbol sym = prodf.get(ct);
 					if(sym.equals(ntt)){
