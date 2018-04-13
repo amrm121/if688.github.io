@@ -1,10 +1,8 @@
 # if688.github.io
 Site da disciplina IF688 - Teoria e Implementação de Linguagens Computacionais, Ciência da Computação, CIn-UFPE
-
-- Atividades:
-  - [Atividade 1 JFlex Lexer](2018.1/atividades/01-JFlex) 
-  - [Atividade 2 LL1 Parsing](2018.1/atividades/02-LL1parsing/)
+ - [Atividade 1 JFlex Lexer](2018.1/atividades/01-JFlex) 
+ - [Atividade 2 LL1 Parsing](2018.1/atividades/02-LL1parsing/)
     - [SetGenerator.java](https://github.com/amrm121/if688.github.io/tree/alternativeF/2018.1/atividades/02-LL1parsing/src/br/ufpe/cin/if688/parsing/analysis/SetGenerator.java)
     - [Table.java](https://github.com/amrm121/if688.github.io/tree/alternativeF/2018.1/atividades/02-LL1parsing/src/br/ufpe/cin/if688/table/Table.java)
-
+ - [Atividade 3 Simple Interpreter](2018.1/atividades/03-SimpleInterpreter/)
  
