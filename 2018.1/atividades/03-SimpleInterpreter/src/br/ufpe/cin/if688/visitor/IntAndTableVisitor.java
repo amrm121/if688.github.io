@@ -17,14 +17,21 @@ import br.ufpe.cin.if688.symboltable.Table;
 
 public class IntAndTableVisitor implements IVisitor<IntAndTable> {
 	private Table t;
-
-	public IntAndTableVisitor(Table t) {
+	private Interpreter i;
+	private boolean print = false;
+	
+	public IntAndTableVisitor(Object c) {
+		
+	}
+	
+	public IntAndTableVisitor(Table t, Interpreter I) {
 		this.t = t;
+		this.i = I;
 	}
 
 	@Override
 	public IntAndTable visit(Stm s) {
-		// TODO Auto-generated method stub
+		s.accept(this);
 		return null;
 	}
 
@@ -36,61 +43,109 @@ public class IntAndTableVisitor implements IVisitor<IntAndTable> {
 
 	@Override
 	public IntAndTable visit(CompoundStm s) {
-		// TODO Auto-generated method stub
+		s.getStm1().accept(this);
+		s.getStm2().accept(this);
 		return null;
 	}
 
 	@Override
 	public IntAndTable visit(PrintStm s) {
-		// TODO Auto-generated method stub
+		s.getExps().accept(this);
 		return null;
 	}
 
 	@Override
 	public IntAndTable visit(Exp e) {
-		// TODO Auto-generated method stub
+		e.accept(this);
 		return null;
 	}
 
 	@Override
 	public IntAndTable visit(EseqExp e) {
-		// TODO Auto-generated method stub
+		e.getExp().accept(this);
+		if(e.getStm() instanceof PrintStm) {
+			print = true;
+			e.getStm().accept(this);
+		}
 		return null;
 	}
 
 	@Override
 	public IntAndTable visit(IdExp e) {
-		// TODO Auto-generated method stub
+		Table tt = this.t;
+		while(tt.tail != null) {
+			if(tt.id.equals(e.getId())) {
+				return new IntAndTable(tt.value, this.t);
+			}
+			else {
+				tt = tt.tail;
+			}
+		}
+		if(tt.id.equals(e.getId())) {
+			if(print) {
+				t = new Table(tt.id, tt.value, this.t);
+				return new IntAndTable(tt.value, this.t);
+			}else {
+				return new IntAndTable(tt.value, this.t);
+			}
+
+		}
 		return null;
 	}
 
 	@Override
 	public IntAndTable visit(NumExp e) {
-		// TODO Auto-generated method stub
-		return null;
+		return new IntAndTable(e.getNum(), this.t);
 	}
 
 	@Override
 	public IntAndTable visit(OpExp e) {
-		// TODO Auto-generated method stub
+		IntAndTable esq = e.getLeft().accept(this);
+		IntAndTable dir = e.getRight().accept(this);
+		int answ = -1;
+		int a = esq.result;
+		int b = dir.result;
+		switch(e.getOper()){ //public final static int Plus = 1, Minus = 2, Times = 3, Div = 4;
+		case 1:
+			answ = a+b;
+			break;
+		case 2:
+			answ = a - b;
+			break;
+		case 3:
+			answ = a * b;
+			break;
+		case 4:
+			if(b == 0 || b%a!= 0) { throw new RuntimeException("Resultado não inteiro!");}
+			else {
+				answ = a / b;
+			}
+			break;
+		default:
+			break;
+		}
+		if(answ == -1) {throw new RuntimeException();}
+		this.t.value = answ;
+		if(print)i.newEntry(t.id, t.value);
 		return null;
 	}
 
 	@Override
 	public IntAndTable visit(ExpList el) {
-		// TODO Auto-generated method stub
+		el.accept(this);
 		return null;
 	}
 
 	@Override
 	public IntAndTable visit(PairExpList el) {
-		// TODO Auto-generated method stub
+		el.getHead().accept(this);
+		el.getTail().accept(this);
 		return null;
 	}
 
 	@Override
 	public IntAndTable visit(LastExpList el) {
-		// TODO Auto-generated method stub
+		el.getHead().accept(this);
 		return null;
 	}
 

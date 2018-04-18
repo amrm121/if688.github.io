@@ -14,6 +14,7 @@ import br.ufpe.cin.if688.ast.PrintStm;
 import br.ufpe.cin.if688.ast.Stm;
 
 public class MaxArgsVisitor implements IVisitor<Integer> {
+	
 
 	@Override
 	public Integer visit(Stm s) {
@@ -34,24 +35,25 @@ public class MaxArgsVisitor implements IVisitor<Integer> {
 
 	@Override
 	public Integer visit(PrintStm s) {
+		int k = s.getExps().accept(this);
+		return k;
+	}
+
+	@Override
+	public Integer visit(Exp e) {
 		
 		return null;
 	}
 
 	@Override
-	public Integer visit(Exp e) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public Integer visit(EseqExp e) {
-		// TODO Auto-generated method stub
-		return null;
+		int j = e.getStm().accept(this);
+		return j;
 	}
 
 	@Override
 	public Integer visit(IdExp e) {
+		
 		return 0;
 	}
 
@@ -62,26 +64,29 @@ public class MaxArgsVisitor implements IVisitor<Integer> {
 
 	@Override
 	public Integer visit(OpExp e) {
-		// TODO Auto-generated method stub
-		return null;
+		return 0;
 	}
 
 	@Override
 	public Integer visit(ExpList el) {
-		// TODO Auto-generated method stub
-		return null;
+		return el.accept(this);
 	}
 
 	@Override
 	public Integer visit(PairExpList el) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		int hd = el.getHead().accept(this);
+		int tail = el.getTail().accept(this);
+		return hd+tail+1;
 	}
 
 	@Override
 	public Integer visit(LastExpList el) {
-		// TODO Auto-generated method stub
-		return null;
+		if(el.getHead() instanceof EseqExp) {
+			int k = el.getHead().accept(this);
+			return Math.max(2, k);
+		}
+		return 1+el.getHead().accept(this);
 	}
 	
 

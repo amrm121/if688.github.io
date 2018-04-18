@@ -12,51 +12,65 @@ import br.ufpe.cin.if688.ast.OpExp;
 import br.ufpe.cin.if688.ast.PairExpList;
 import br.ufpe.cin.if688.ast.PrintStm;
 import br.ufpe.cin.if688.ast.Stm;
+import br.ufpe.cin.if688.symboltable.IntAndTable;
 import br.ufpe.cin.if688.symboltable.Table;
 
 public class Interpreter implements IVisitor<Table> {
-	
+	private IntAndTableVisitor iatv = new IntAndTableVisitor(null);
 	//a=8;b=80;a=7;
 	// a->7 ==> b->80 ==> a->8 ==> NIL
 	private Table t;
 	
 	public Interpreter(Table t) {
+		this.iatv = new IntAndTableVisitor(t, this);
 		this.t = t;
 	}
 
 	@Override
 	public Table visit(Stm s) {
-		// TODO Auto-generated method stub
+		s.accept(this);
+		Table tt = this.t;
+		if(tt == null) {return null;}
+		for(; tt.tail != null; tt = tt.tail) {
+			System.out.print(tt.id + "->" + tt.value + " ==> ");
+		}
+		System.out.println(tt.id + "->" + tt.value + " ==> " + "NIL");
 		return null;
+	}
+	
+	public void newEntry(String id, int val) {
+		t = new Table(id, val, this.t);
 	}
 
 	@Override
 	public Table visit(AssignStm s) {
-		// TODO Auto-generated method stub
+		t = new Table(s.getId(), 0, this.t);
+		iatv = new IntAndTableVisitor(this.t, this);
+		iatv.visit(s.getExp());
 		return null;
 	}
 
 	@Override
 	public Table visit(CompoundStm s) {
-		// TODO Auto-generated method stub
+		s.getStm1().accept(this);
+		s.getStm2().accept(this);
 		return null;
 	}
 
 	@Override
 	public Table visit(PrintStm s) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public Table visit(Exp e) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Table visit(EseqExp e) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -68,19 +82,19 @@ public class Interpreter implements IVisitor<Table> {
 
 	@Override
 	public Table visit(NumExp e) {
-		// TODO Auto-generated method stub
+		//t = new Table(null, e.getNum(), this.t);
 		return null;
 	}
 
 	@Override
 	public Table visit(OpExp e) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public Table visit(ExpList el) {
-		// TODO Auto-generated method stub
+		System.out.println("ExpList Visit");
 		return null;
 	}
 
@@ -92,7 +106,10 @@ public class Interpreter implements IVisitor<Table> {
 
 	@Override
 	public Table visit(LastExpList el) {
-		// TODO Auto-generated method stub
+		if(el.getHead() instanceof NumExp) {
+			//t = new Table(el.getClass().getSimpleName(), el.hashCode(), this.t);
+			el.getHead().accept(this);
+		}
 		return null;
 	}
 

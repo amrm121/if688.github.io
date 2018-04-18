@@ -9,4 +9,5 @@ public class Table {
 		value = v;
 		tail = t;
 	}
+
 }
