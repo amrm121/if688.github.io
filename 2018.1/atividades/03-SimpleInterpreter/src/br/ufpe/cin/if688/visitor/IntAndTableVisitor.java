@@ -116,7 +116,7 @@ public class IntAndTableVisitor implements IVisitor<IntAndTable> {
 			answ = a * b;
 			break;
 		case 4:
-			if(b == 0 || b%a!= 0) { throw new RuntimeException("Resultado não inteiro!");}
+			if(b == 0) { throw new RuntimeException("Divisao por zero.");}
 			else {
 				answ = a / b;
 			}
@@ -124,7 +124,7 @@ public class IntAndTableVisitor implements IVisitor<IntAndTable> {
 		default:
 			break;
 		}
-		if(answ == -1) {throw new RuntimeException();}
+		if(answ == -1) {throw new RuntimeException("Operacao invalida.");}
 		this.t.value = answ;
 		if(print)i.newEntry(t.id, t.value);
 		return null;

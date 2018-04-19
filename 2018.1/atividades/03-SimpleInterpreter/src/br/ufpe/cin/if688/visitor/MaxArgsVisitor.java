@@ -23,7 +23,7 @@ public class MaxArgsVisitor implements IVisitor<Integer> {
 
 	@Override
 	public Integer visit(AssignStm s) {
-		return s.getExp().accept(this);
+		return s.getExp().accept(this); 
 	}
 
 	@Override
@@ -47,8 +47,9 @@ public class MaxArgsVisitor implements IVisitor<Integer> {
 
 	@Override
 	public Integer visit(EseqExp e) {
-		int j = e.getStm().accept(this);
-		return j;
+		int stm = e.getStm().accept(this);
+		int exp = e.getExp().accept(this);
+		return Math.max(stm, exp);
 	}
 
 	@Override
@@ -84,7 +85,7 @@ public class MaxArgsVisitor implements IVisitor<Integer> {
 	public Integer visit(LastExpList el) {
 		if(el.getHead() instanceof EseqExp) {
 			int k = el.getHead().accept(this);
-			return Math.max(2, k);
+			return k;
 		}
 		return 1+el.getHead().accept(this);
 	}

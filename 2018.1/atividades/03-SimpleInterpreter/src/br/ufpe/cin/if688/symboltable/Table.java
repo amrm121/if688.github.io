@@ -9,5 +9,10 @@ public class Table {
 		value = v;
 		tail = t;
 	}
+	
+	@Override
+	public String toString() {
+		return "[ " + id + "->" + value + " ==> " + tail + " ]";
+	}
 
 }

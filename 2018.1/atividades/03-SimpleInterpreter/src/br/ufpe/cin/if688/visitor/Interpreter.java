@@ -12,7 +12,6 @@ import br.ufpe.cin.if688.ast.OpExp;
 import br.ufpe.cin.if688.ast.PairExpList;
 import br.ufpe.cin.if688.ast.PrintStm;
 import br.ufpe.cin.if688.ast.Stm;
-import br.ufpe.cin.if688.symboltable.IntAndTable;
 import br.ufpe.cin.if688.symboltable.Table;
 
 public class Interpreter implements IVisitor<Table> {
@@ -29,13 +28,13 @@ public class Interpreter implements IVisitor<Table> {
 	@Override
 	public Table visit(Stm s) {
 		s.accept(this);
-		Table tt = this.t;
+		/*Table tt = this.t;
 		if(tt == null) {return null;}
 		for(; tt.tail != null; tt = tt.tail) {
 			System.out.print(tt.id + "->" + tt.value + " ==> ");
 		}
-		System.out.println(tt.id + "->" + tt.value + " ==> " + "NIL");
-		return null;
+		System.out.println(tt.id + "->" + tt.value + " ==> " + "NIL");*/
+		return t;
 	}
 	
 	public void newEntry(String id, int val) {
@@ -59,7 +58,6 @@ public class Interpreter implements IVisitor<Table> {
 
 	@Override
 	public Table visit(PrintStm s) {
-		
 		return null;
 	}
 
@@ -76,13 +74,13 @@ public class Interpreter implements IVisitor<Table> {
 
 	@Override
 	public Table visit(IdExp e) {
-		// TODO Auto-generated method stub
+
 		return null;
 	}
 
 	@Override
 	public Table visit(NumExp e) {
-		//t = new Table(null, e.getNum(), this.t);
+
 		return null;
 	}
 
@@ -94,22 +92,19 @@ public class Interpreter implements IVisitor<Table> {
 
 	@Override
 	public Table visit(ExpList el) {
-		System.out.println("ExpList Visit");
+		
 		return null;
 	}
 
 	@Override
 	public Table visit(PairExpList el) {
-		// TODO Auto-generated method stub
+
 		return null;
 	}
 
 	@Override
 	public Table visit(LastExpList el) {
-		if(el.getHead() instanceof NumExp) {
-			//t = new Table(el.getClass().getSimpleName(), el.hashCode(), this.t);
-			el.getHead().accept(this);
-		}
+		
 		return null;
 	}
 

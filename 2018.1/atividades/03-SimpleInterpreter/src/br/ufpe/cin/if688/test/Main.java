@@ -13,13 +13,14 @@ class Main {
 		System.out.println("MaxArgs Prog2: " + maxArgs.visit(Prog.prog2));
 		System.out.println("MaxArgs print1234: " + maxArgs.visit(Prog.print1234));
 		System.out.println("MaxArgs printPrint: " + maxArgs.visit(Prog.printPrint));
+		System.out.println("MaxArgs printPrint: " + maxArgs.visit(Prog.prog3));
 		
 		//interpretar programas(Prog.prog...);
 		System.out.println("===================================");
 		System.out.println("Prog.prog");		
 		Interpreter interpreter = new Interpreter(null);
 		Table t = interpreter.visit(Prog.prog);
-		if (t!=null) System.out.println(t.toString()+ " " + t.id + " " + t.value);
+		if (t!=null) System.out.println(t.toString());
 		System.out.println("===================================");
 		System.out.println("Prog.prog2");
 		interpreter = new Interpreter(null);
