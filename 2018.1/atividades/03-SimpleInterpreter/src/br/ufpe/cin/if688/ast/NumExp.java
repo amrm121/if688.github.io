@@ -3,13 +3,13 @@ package br.ufpe.cin.if688.ast;
 import br.ufpe.cin.if688.visitor.IVisitor;
 
 public class NumExp extends Exp {
-	int num;
+	double num;
 
-	public NumExp(int n) {
+	public NumExp(double n) {
 		num = n;
 	}
 
-	public int getNum() {
+	public double getNum() {
 		return num;
 	}
 

@@ -17,80 +17,55 @@ import br.ufpe.cin.if688.symboltable.Table;
 
 public class IntAndTableVisitor implements IVisitor<IntAndTable> {
 	private Table t;
-	private Interpreter i;
-	private boolean print = false;
-	
-	public IntAndTableVisitor(Object c) {
-		
-	}
-	
-	public IntAndTableVisitor(Table t, Interpreter I) {
+	//private boolean print = false;
+
+	public IntAndTableVisitor(Table t) {
 		this.t = t;
-		this.i = I;
 	}
 
 	@Override
 	public IntAndTable visit(Stm s) {
-		s.accept(this);
 		return null;
 	}
 
 	@Override
 	public IntAndTable visit(AssignStm s) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public IntAndTable visit(CompoundStm s) {
-		s.getStm1().accept(this);
-		s.getStm2().accept(this);
 		return null;
 	}
 
 	@Override
 	public IntAndTable visit(PrintStm s) {
-		s.getExps().accept(this);
 		return null;
 	}
 
 	@Override
 	public IntAndTable visit(Exp e) {
-		e.accept(this);
-		return null;
+		return e.accept(this);
 	}
 
 	@Override
 	public IntAndTable visit(EseqExp e) {
-		e.getExp().accept(this);
-		if(e.getStm() instanceof PrintStm) {
-			print = true;
-			e.getStm().accept(this);
-		}
-		return null;
+		t = e.getStm().accept(new Interpreter(this.t));
+		IntAndTable exp = e.getExp().accept(this);
+		return new IntAndTable(exp.result, t);
 	}
 
 	@Override
 	public IntAndTable visit(IdExp e) {
-		Table tt = this.t;
-		while(tt.tail != null) {
-			if(tt.id.equals(e.getId())) {
-				return new IntAndTable(tt.value, this.t);
-			}
-			else {
-				tt = tt.tail;
-			}
-		}
-		if(tt.id.equals(e.getId())) {
-			if(print) {
-				t = new Table(tt.id, tt.value, this.t);
-				return new IntAndTable(tt.value, this.t);
+		Table aux = this.t;
+		while(aux != null) {
+			if(aux.id.equals(e.getId())) {
+				break;
 			}else {
-				return new IntAndTable(tt.value, this.t);
+				aux = aux.tail;
 			}
-
 		}
-		return null;
+		return new IntAndTable(aux.value, this.t);
 	}
 
 	@Override
@@ -102,12 +77,12 @@ public class IntAndTableVisitor implements IVisitor<IntAndTable> {
 	public IntAndTable visit(OpExp e) {
 		IntAndTable esq = e.getLeft().accept(this);
 		IntAndTable dir = e.getRight().accept(this);
-		int answ = -1;
-		int a = esq.result;
-		int b = dir.result;
-		switch(e.getOper()){ //public final static int Plus = 1, Minus = 2, Times = 3, Div = 4;
+		double a = esq.result;
+		double b = dir.result;
+		double answ = -99999;
+		switch(e.getOper()) {
 		case 1:
-			answ = a+b;
+			answ = a + b;
 			break;
 		case 2:
 			answ = a - b;
@@ -115,37 +90,29 @@ public class IntAndTableVisitor implements IVisitor<IntAndTable> {
 		case 3:
 			answ = a * b;
 			break;
-		case 4:
-			if(b == 0) { throw new RuntimeException("Divisao por zero.");}
-			else {
-				answ = a / b;
-			}
+		case 4: 
+			answ = a / b;
 			break;
 		default:
-			break;
+			throw new RuntimeException("Operacao invalida.");
 		}
-		if(answ == -1) {throw new RuntimeException("Operacao invalida.");}
-		this.t.value = answ;
-		if(print)i.newEntry(t.id, t.value);
-		return null;
+		//System.out.println((double)answ);
+		//this.t.value = answ;
+		return new IntAndTable(answ, this.t);
 	}
 
 	@Override
 	public IntAndTable visit(ExpList el) {
-		el.accept(this);
 		return null;
 	}
 
 	@Override
 	public IntAndTable visit(PairExpList el) {
-		el.getHead().accept(this);
-		el.getTail().accept(this);
 		return null;
 	}
 
 	@Override
 	public IntAndTable visit(LastExpList el) {
-		el.getHead().accept(this);
 		return null;
 	}
 

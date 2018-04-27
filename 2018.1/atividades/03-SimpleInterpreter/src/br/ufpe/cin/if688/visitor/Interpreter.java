@@ -12,41 +12,32 @@ import br.ufpe.cin.if688.ast.OpExp;
 import br.ufpe.cin.if688.ast.PairExpList;
 import br.ufpe.cin.if688.ast.PrintStm;
 import br.ufpe.cin.if688.ast.Stm;
+import br.ufpe.cin.if688.symboltable.IntAndTable;
 import br.ufpe.cin.if688.symboltable.Table;
 
 public class Interpreter implements IVisitor<Table> {
-	private IntAndTableVisitor iatv = new IntAndTableVisitor(null);
+	private IntAndTableVisitor iatv;
 	//a=8;b=80;a=7;
 	// a->7 ==> b->80 ==> a->8 ==> NIL
 	private Table t;
 	
 	public Interpreter(Table t) {
-		this.iatv = new IntAndTableVisitor(t, this);
 		this.t = t;
 	}
 
 	@Override
 	public Table visit(Stm s) {
 		s.accept(this);
-		/*Table tt = this.t;
-		if(tt == null) {return null;}
-		for(; tt.tail != null; tt = tt.tail) {
-			System.out.print(tt.id + "->" + tt.value + " ==> ");
-		}
-		System.out.println(tt.id + "->" + tt.value + " ==> " + "NIL");*/
 		return t;
 	}
 	
-	public void newEntry(String id, int val) {
-		t = new Table(id, val, this.t);
-	}
 
 	@Override
 	public Table visit(AssignStm s) {
-		t = new Table(s.getId(), 0, this.t);
-		iatv = new IntAndTableVisitor(this.t, this);
-		iatv.visit(s.getExp());
-		return null;
+		iatv = new IntAndTableVisitor(this.t);
+		IntAndTable res = s.getExp().accept(iatv);
+		t = new Table(s.getId(), res.result, this.t);
+		return t; //EseqExp / ProgEseqExp precisam do return da table no assign
 	}
 
 	@Override
@@ -58,12 +49,25 @@ public class Interpreter implements IVisitor<Table> {
 
 	@Override
 	public Table visit(PrintStm s) {
-		return null;
+		ExpList el = s.getExps();
+		iatv = new IntAndTableVisitor(this.t);
+		while(true) {
+			if(el instanceof PairExpList) { //se houver mais de um parametro, a tail contem outra explist
+				IntAndTable aux = iatv.visit(((PairExpList) el).getHead());
+				el = ((PairExpList) el).getTail();
+				System.out.println(aux.result);
+			}else { //se for o ultimo item imprimo e saio do laço pois nao tem tail no lastexplist
+				IntAndTable aux = iatv.visit(((LastExpList) el).getHead());
+				System.out.println(aux.result);
+				break;
+			}
+		}
+		return t;
 	}
 
 	@Override
-	public Table visit(Exp e) {
-		return null;
+	public Table visit(Exp e) { //quando o intandtablevisitor chama no visit do EseqExp o statement
+		return e.accept(this); 
 	}
 
 	@Override
@@ -74,13 +78,12 @@ public class Interpreter implements IVisitor<Table> {
 
 	@Override
 	public Table visit(IdExp e) {
-
+		
 		return null;
 	}
 
 	@Override
 	public Table visit(NumExp e) {
-
 		return null;
 	}
 
@@ -92,19 +95,17 @@ public class Interpreter implements IVisitor<Table> {
 
 	@Override
 	public Table visit(ExpList el) {
-		
 		return null;
 	}
 
 	@Override
 	public Table visit(PairExpList el) {
-
+		
 		return null;
 	}
 
 	@Override
 	public Table visit(LastExpList el) {
-		
 		return null;
 	}
 
